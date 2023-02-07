@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<title>Investment Form</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+	</head>
+
+	<body>
+		<h1 align="center">.:Calculate your investment return:.</h1>
+		
+		<table align="center">
+			<thead>
+				<tr>
+					<th>Iitial Investment</th>
+					<th>Annal Contributtion</th>
+					<th>% Annual Increase</th>
+					<th>Investment years</th>
+					<th>% Investment Yield</th>
+				</tr>
+				<tr>
+					<th><input id="initInvest" type="number"></th>
+					<th><input id="annualCont" type="number"></th>
+					<th><input id="annualInc" type="number"></th>
+					<th><input id="investYears" type="number"></th>
+					<th><input id="investReturn" type="number"></th>
+				</tr>
+			</thead>
+		</table>
+		
+		<div>
+			<button id="btn" type="button" style="margin:auto; display:block">¡Let's calculate!</button>
+		</div>
+		
+		
+		<table id="results" align="center">
+			<thead>
+				<tr>
+					<th>Final Amount</th>
+					<th>Investment Profit</th>
+				</tr>
+				<tr>
+					<th width="200px"><div id="finalA"></div></th>
+					<th width="200px"><div id="invPrft"></div></th>
+				</tr>
+			</thead>
+		</table>
+		
+		<table id="error" align="center">
+			<thead>
+				<tr>
+					<th><div id="errorDiv"></div></th>
+				</tr>
+			</thead>
+		</table>
+		
+		<script>
+
+				$("#btn").click(function(){
+				
+					var jsonValues = {};
+					
+					jsonValues["initialInvestment"] = $("#initInvest").val() == null ? 0 : $("#initInvest").val();
+					jsonValues["annualContribution"] = $("#annualCont").val() == null ? 0 : $("#annualCont").val();
+					jsonValues["annualIncrease"] = $("#annualInc").val() == null ? 0 : $("#annualInc").val();
+					jsonValues["investmentYears"] = $("#investYears").val() == null ? 0 : $("#investYears").val();
+					jsonValues["investmentReturn"] = $("#investReturn").val() == null ? 0 : $("#investYears").val();
+				
+					if($("#initInvest").val() == 0 || $("#annualCont").val() == 0 ||
+							$("#annualInc").val() == 0 || $("#investYears").val() == 0 || $("#investReturn").val() == 0){
+						
+						$("#errorDiv").html("Is not possible to precess you request with the data provided.");
+					
+					}else{
+					
+						$.ajax({
+							type: "POST",
+							url: "http://localhost:8080/service/calculation",
+							crossDomain: true,
+							headers: {'Access-Control-Allow-Origin': '*'},
+							contentType: "application/json; charset=utf-8",
+							dataType: "json",
+							data: JSON.stringify(jsonValues),
+							timeout: 600000,
+							cache: false,
+							success: function(data){
+								$("#finalA").html("$ " + JSON.stringify(data.finalAmount));
+								$("#invPrft").html("$ " + JSON.stringify(data.investmentProfit));
+							},
+							error: function(error){
+								console.log("Error: ", error);
+								var json = JSON.stringify(error);
+								$("#errorDiv").html(json);
+							}
+						});
+					
+					}
+					
+				});
+		
+		</script>
+		
+	</body>
+
+</html>
